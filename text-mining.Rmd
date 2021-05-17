@@ -59,6 +59,21 @@ to_TDM <- function(corp){
 my_tdm <- to_TDM(corp)
 ```
 
+## Creamos un contenedor para eliminar posibles carácteres especiales del corpus y hacemos un inspect antes y después para observar posibles cambios
+```{r}
+
+inspect(corp)
+
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+corp <- tm_map(corp, toSpace, "\n")
+corp <- tm_map(corp, toSpace, "<d5>")
+corp <- tm_map(corp, toSpace, "<d1>")
+corp <- tm_map(corp, toSpace, "\f")
+
+inspect(corp)
+```
+
+
 ## Inspeccionamos los 100 primeros elementos de nuestro TDM
 ```{r}
 inspect(my_tdm[1:100,])

@@ -1,0 +1,87 @@
+---
+title: "text-mining"
+author: "G13"
+date: "17/5/2021"
+output: html_document
+---
+
+
+# Ejercicio Text Mining - Grupo 13
+* Integrantes del grupo: 
+  * Marta López Pérez
+  * Álvaro Alemán Rando
+
+## Librerías que vamos a utilizar
+```{r}
+library(pdftools)
+library(tm)
+```
+
+## Primero, seleccionamos el directorio que vamos a utilizar que contienen los pdfs
+```{r}
+directorio.textos <- file.path("./","pdftextmining2021")
+dir(directorio.textos)
+files <- DirSource(directorio.textos)
+```
+
+## Leemos los documentos pdfs haciendo una función lapply y comprobamos cuantos de los pdfs ha podido leer
+```{r}
+opinions <- lapply(files, pdf_text)
+
+length(opinions)
+
+lapply(opinions,length)
+```
+
+## Creamos un Corpus y posteriormente convertimos a TDM el Corpus
+* Para convertirlo a TDM usamos los parámetros siguientes: 
+  * removePunctuation = TRUE --> Que lo usamos para eliminar todos los símbolos de puntuación.
+  * stopwords = TRUE --> Elimina las palabras uniones (p.ej: "in", "for", "the",...).
+  * tolower = TRUE --> Pasa el texto a minúsculas.
+  * stemming = FALSE --> Stemming = eliminar palabras que derivan de otras. Está en FALSE para este ejercicio
+  * removeNumbers = TRUE --> Elimina los números
+  * bounds = list(global = c(3, Inf) --> Cuenta solo las palabras que aparecen un mínimo de 3 veces.
+```{r}
+corp <- VCorpus(VectorSource(opinions))
+
+to_TDM <- function(corp){
+  my_tdm <- TermDocumentMatrix(corp, 
+                                  control = 
+                                    list(removePunctuation = TRUE,
+                                      stopwords = TRUE,
+                                      tolower = TRUE,
+                                      stemming = FALSE,
+                                      removeNumbers = TRUE,
+                                      bounds = list(global = c(3, Inf))))
+
+}
+
+my_tdm <- to_TDM(corp)
+```
+
+## Inspeccionamos los 100 primeros elementos de nuestro TDM
+```{r}
+inspect(my_tdm[1:100,])
+```
+
+## Usando otras funciones de la librería tm podemos ver cuales son los términos más frecuentes (Al menos 40 veces)
+* Y vemos la cuenta total decreciente de los términos más usados
+```{r}
+terminos_frecuentes <- findFreqTerms(my_tdm, lowfreq = 40, highfreq = Inf)
+
+tf.tdm <- as.matrix(my_tdm[terminos_frecuentes,])
+
+sort(apply(tf.tdm, 1, sum), decreasing = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+
+
